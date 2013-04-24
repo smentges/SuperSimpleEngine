@@ -1,9 +1,11 @@
 #include <iostream>
 #include "FileIO.h"
+#include "GameManager.h"
 using namespace std;
 
 int main() {
-	FileIO::getInstance().LoadLevel("hole.00.db");
+	GameManager gameManager;
+	gameManager.Initialize();
 
 	cin.get();
 }

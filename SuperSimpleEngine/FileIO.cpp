@@ -2,6 +2,7 @@
 #include "Tile.h"
 
 Level FileIO::LoadLevel(string fname) {
+	Level level;
 	cout << "Reading level from file..." << endl;
 	ifstream file;
 	string line = "";
@@ -17,15 +18,15 @@ Level FileIO::LoadLevel(string fname) {
 		getline(file, line);
 		if(line != "") {
 			lineElements = splitVals(line);
-			loadLevelObject(lineElements);
+			level.LevelObjects.push_back(loadLevelObject(lineElements));
 		}
 	}
 	
 	cout << "Level loaded from file!" << endl << endl;
-	return Level();
+	return level;
 }
 
-void FileIO::loadLevelObject(vector<string> line) {
+Object3D FileIO::loadLevelObject(vector<string> line) {
 	if(line[0] == "tile") {
 		cout << "Reading in a tile from file..." << endl;
 		int id = atoi(line[1].c_str());
@@ -39,11 +40,14 @@ void FileIO::loadLevelObject(vector<string> line) {
 		for(int i = 0; i < 4; i++)
 			neighbors[i] = atof(line[i+15].c_str());
 
-		Tile(id, edges, vertInfo, neighbors);
+		Object3D tile = Tile(id, edges, vertInfo, neighbors);
+		return tile;
 	}
 	else {
 		cout << "Keyword: " + line[0] + " not reckognized." << endl;
 	}
+	cout << "No keywords recognized, empty object returned" << endl;
+	return Object3D();
 }
 
 vector<string> FileIO::splitVals(string line) {

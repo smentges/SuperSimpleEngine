@@ -4,9 +4,10 @@
 #include <iostream>
 #include <sstream>
 #include <vector>
+#include "Object3D.h"
 using namespace std;
 
-class Tile
+class Tile: public Object3D
 {
 public:
 	Tile(int id, int edges, float vertInfo[], int neighbors[]);
