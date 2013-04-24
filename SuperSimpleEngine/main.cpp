@@ -1,10 +1,9 @@
 #include <iostream>
-
+#include "FileIO.h"
 using namespace std;
 
 int main() {
-
-	cout << "HELLO WORLD";
+	FileIO::getInstance().LoadLevel("hole.00.db");
 
 	cin.get();
 }
