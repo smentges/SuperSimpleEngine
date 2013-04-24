@@ -1,4 +1,5 @@
 #include "FileIO.h"
+#include "Tile.h"
 
 Level FileIO::LoadLevel(string fname) {
 	cout << "Reading level from file..." << endl;
@@ -37,6 +38,8 @@ void FileIO::loadLevelObject(vector<string> line) {
 
 		for(int i = 0; i < 4; i++)
 			neighbors[i] = atof(line[i+15].c_str());
+
+		Tile(id, edges, vertInfo, neighbors);
 	}
 	else {
 		cout << "Keyword: " + line[0] + " not reckognized." << endl;
