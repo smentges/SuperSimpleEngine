@@ -27,6 +27,6 @@ class FileIO
 		FileIO(FileIO const&);              // Don't Implement
 		void operator=(FileIO const&); // Don't implement
 		vector<string> splitVals(string line);
-		Object3D loadLevelObject(vector<string> line);
+		Object3D *loadLevelObject(vector<string> line);
 };
 

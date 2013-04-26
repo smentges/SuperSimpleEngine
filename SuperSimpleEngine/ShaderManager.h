@@ -7,8 +7,8 @@ using namespace std;
 class ShaderManager
 {
 private:
-	const GLcharARB* simpleShaderVertSource;
-	const GLcharARB* simpleShaderFragSource;
+	char* simpleShaderVertSource;
+	char* simpleShaderFragSource;
 public:
 	static ShaderManager& getInstance()
 	{

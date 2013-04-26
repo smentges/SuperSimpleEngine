@@ -1,6 +1,7 @@
 #include "ShaderManager.h"
 #include <iostream>
 #include <fstream>
+using namespace std;
 
 // http://nehe.gamedev.net/article/glsl_an_introduction/25007/
 ShaderManager::ShaderManager(void)
@@ -9,37 +10,42 @@ ShaderManager::ShaderManager(void)
 
 void ShaderManager::InitShaders() {
 	cout << endl << "Initializing shaders...";
+
 	GLenum tempVertShaderObj, tempFragShaderObj;
+
 	//Make the paths private variables later
 	simpleShaderVertSource = getShaderSource("Shaders/SimpleShaders/simpleVert.txt");
 	simpleShaderFragSource = getShaderSource("Shaders/SimpleShaders/simpleFrag.txt");
 
 	// Make program
-	simpleShaderProgram = glCreateProgramObjectARB();
+	simpleShaderProgram = glCreateProgram();
 
 	// Make shaders
-	tempVertShaderObj = glCreateShaderObjectARB(GL_VERTEX_SHADER_ARB);
-	tempFragShaderObj = glCreateShaderObjectARB(GL_FRAGMENT_SHADER_ARB);
+	tempVertShaderObj = glCreateShader(GL_VERTEX_SHADER);
+	tempFragShaderObj = glCreateShader(GL_FRAGMENT_SHADER);
 
 	// Load Shader Sources
-	glShaderSourceARB(tempVertShaderObj, 1, &simpleShaderVertSource, NULL);
-	glShaderSourceARB(tempFragShaderObj, 1, &simpleShaderFragSource, NULL);
+	glShaderSource(tempVertShaderObj, 1, (const GLchar**) &simpleShaderVertSource, NULL);
+	glShaderSource(tempFragShaderObj, 1, (const GLchar**) &simpleShaderFragSource, NULL);
 
 	// Compile Shaders
-	glCompileShaderARB(tempVertShaderObj);
-	glCompileShaderARB(tempFragShaderObj);
+	glCompileShader(tempVertShaderObj);
+	glCompileShader(tempFragShaderObj);
 
 	// Attach Shaders
-	glAttachObjectARB(simpleShaderProgram, tempVertShaderObj);
+	glAttachShader(simpleShaderProgram, tempVertShaderObj);
+	glAttachShader(simpleShaderProgram, tempFragShaderObj);
 
-	// Use program (anything drawn after this will go through the program) THIS WILL BE REMOVED FROM HERE LATER ON SINCE IT BELONGS SOMEWHERE ELSE
-	glUseProgramObjectARB(simpleShaderProgram);
+	// Link program
+	glLinkProgram(simpleShaderProgram);
+
+	// Use program THIS WILL BE REMOVED FROM HERE LATER ON SINCE IT BELONGS SOMEWHERE ELSE
+	glUseProgram(simpleShaderProgram);
 
 	cout << endl <<  "Shaders initialized!";
 }
 
-ShaderManager::~ShaderManager(void)
-{
+ShaderManager::~ShaderManager(void) {
 }
 
 //http://www.cplusplus.com/reference/istream/istream/read/
@@ -53,6 +59,7 @@ char*  ShaderManager::getShaderSource(string shaderSource) {
 		is.seekg(0, is.beg);
 
 		char * buffer = new char[length];
+		
 		is.read(buffer, length);
 
 		if (!is)

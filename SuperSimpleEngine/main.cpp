@@ -5,8 +5,6 @@
 using namespace std;
 
 int main(int argc, char **argv) {
-	GameManager gm = GameManager::getInstance();
-	gm.Run(argc, argv);
-
-	cin.get();
+	GameManager *gm = &GameManager::getInstance();
+	gm->Run(argc, argv);
 }

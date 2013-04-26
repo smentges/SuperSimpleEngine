@@ -7,7 +7,7 @@ using namespace std;
 class Level
 {
 public:
-	vector<Object3D> LevelObjects;
+	vector<Object3D*> LevelObjects;
 	Level(void);
 	~Level(void);
 };
