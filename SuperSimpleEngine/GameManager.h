@@ -1,6 +1,7 @@
 #pragma once
 #include "Level.h"
 #include <vector>
+#include "InputManager.h"
 
 void display();
 void keyboard(unsigned char x, int y, int z);
@@ -27,5 +28,9 @@ public:
 	vector<Level> Course;
 	Level CurrentLevel;
 	//Camera camera;
+	static InputManager *im;
+	static void keyboard(unsigned char key, int y, int z);
+	static void handle_mouse(int b, int s, int x, int y);
+	static void handle_motion( int x, int y );
 };
 
