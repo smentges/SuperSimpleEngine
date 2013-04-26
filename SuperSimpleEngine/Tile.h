@@ -8,6 +8,7 @@
 #include <GL/glew.h>
 #include <GL/freeglut.h>
 #include "ShaderManager.h"
+#include "InputManager.h"
 
 using namespace std;
 
@@ -22,5 +23,6 @@ private:
 	int _edges;
 	float _vertInfo[12];
 	int _neighbors[4];
+	static InputManager *im;
 };
 

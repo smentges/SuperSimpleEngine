@@ -35,7 +35,16 @@ Tile::~Tile(void)
 }
 
 void Tile::draw(float deltatime) {
-	cout << "DRAWING TILE";
+	//cout << "DRAWING TILE";
+	InputManager im = InputManager::getInstance();
+	glMatrixMode( GL_MODELVIEW );		// Setup model transformations
+	glClear( GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT );
+
+	//glPushMatrix();
+	glTranslatef( im.translate[ 0 ], im.translate[ 1 ], im.translate[ 2 ] );
+	glRotatef( im.rotate[ 0 ], 1, 0, 0 );
+	glRotatef( im.rotate[ 1 ], 0, 1, 0 );
+	glRotatef( im.rotate[ 2 ], 0, 0, 1 );
 
 	ShaderManager *sm = &ShaderManager::getInstance();
 	GLuint vPosition = glGetAttribLocation(sm->simpleShaderProgram, "vPosition");
@@ -48,5 +57,5 @@ void Tile::draw(float deltatime) {
 	glEnableVertexAttribArray(vPosition);
 	glVertexAttribPointer(vPosition, 3, GL_FLOAT, GL_FALSE, 0, 0);
 
-	cout << "TILE DRAWN";
+	//cout << "TILE DRAWN";
 }

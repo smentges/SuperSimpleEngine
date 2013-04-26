@@ -29,7 +29,7 @@ void GameManager::Initialize(int argc, char **argv) {
 }
 
 void GameManager::initGL(int argc, char **argv) {
-	InputManager im = InputManager::getInstance();
+	InputManager *im = &InputManager::getInstance();
 	cout << endl << "Initializing GLEW and FREEGLUT...";
 
 	glutInit(&argc, argv);
@@ -37,20 +37,36 @@ void GameManager::initGL(int argc, char **argv) {
 	glutInitWindowSize(512, 512);
 	glutCreateWindow("Minigolf");
 
-	// GLEWINIT MUST BE CALLED AFTER MAKING A WINDOW, I DON'T KNOW WHY...
-	string glewError = (char*)glewGetErrorString(glewInit());
-	cout << endl << "GLEW ERROR: " + glewError;
-
 	glutDisplayFunc(display);
 	glutKeyboardFunc(keyboard);
 	glutMotionFunc(handle_motion);
 	glutMouseFunc(handle_mouse);
 
+	glMatrixMode( GL_PROJECTION );	// Setup perspective projection
+	glLoadIdentity();
+	gluPerspective( 70, 1, 1, 40 );
+
+	glMatrixMode( GL_MODELVIEW );		// Setup model transformations
+	glLoadIdentity();
+	gluLookAt( 0, 0, 5, 0, 0, -1, 0, 1, 0 );
+
+	// GLEWINIT MUST BE CALLED AFTER MAKING A WINDOW, I DON'T KNOW WHY...
+	string glewError = (char*)glewGetErrorString(glewInit());
+	cout << endl << "GLEW ERROR: " + glewError;
+
 	cout << endl << "GLEW and FREEGLUT initialized!";
 }
 
 void display() {
+	GameManager *gm = &GameManager::getInstance();
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glEnable(GL_DEPTH_TEST);
+
+	gm->modelView = glm::mat4();
+    gm->modelView = gm->modelView * gm->mTrans;
+    gm->camera = glm::lookAt(glm::vec3(10,10,10), glm::vec3(0,0,0), glm::vec3(0,0,1));
+    gm->camera = gm->crTrans * gm->csTrans * gm->ctTrans * gm->camera;
+    glm::mat4 modelCam = gm->camera * gm->modelView;
 
 	// Think of VBOs as slaves to VAOs. Think of each VBO as an element of a VAO.
 	GLuint vao;
@@ -58,19 +74,18 @@ void display() {
 	glBindVertexArray(vao);	//This is the VAO we are talking about now.
 
 	// Call draw function on all drawable objects in level.
-	GameManager *gm = &GameManager::getInstance();
 	for(unsigned int i = 0; i < gm->CurrentLevel.LevelObjects.size(); i++) { 
 		gm->CurrentLevel.LevelObjects[i]->draw(0.0);
 	}
 
-	glDrawArrays(GL_LINE_LOOP, 0, 4);
+	glDrawArrays(GL_LINES, 0, 4);
 	glutSwapBuffers();
 	glutPostRedisplay();
 };
 
 void GameManager::keyboard(unsigned char key, int y, int z) 
 {
-	InputManager im = InputManager::getInstance();
+	InputManager *im = &InputManager::getInstance();
 
 	switch(key)
 	{
@@ -78,42 +93,41 @@ void GameManager::keyboard(unsigned char key, int y, int z)
 		exit(0);
 		break;
 	case 't':
-		im.curr_mode = TRANSLATE;
+		im->curr_mode = TRANSLATE;
 		break;
 	case 'x':
-		im.curr_mode = ROTATE_X;
+		im->curr_mode = ROTATE_X;
 		break;
 	case 'y':
-		im.curr_mode = ROTATE_Y;
+		im->curr_mode = ROTATE_Y;
 		break;
 	case 'z':
-		im.curr_mode = ROTATE_Z;
+		im->curr_mode = ROTATE_Z;
 		break;
 	}
 };
 
 void GameManager::handle_mouse(int b, int s, int x, int y)
 {
-	InputManager im = InputManager::getInstance();
+	InputManager *im = &InputManager::getInstance();
 	if ( s == GLUT_DOWN ) {		// Store button state if mouse down
-		im.btn[ b ] = 1;
+		im->btn[ b ] = 1;
 	} else {
-		im.btn[ b ] = 0;
+		im->btn[ b ] = 0;
 	}
 
-	im.mouse_x = x;
-	im.mouse_y = glutGet( GLUT_WINDOW_HEIGHT ) - y;
+	im->mouse_x = x;
+	im->mouse_y = glutGet( GLUT_WINDOW_HEIGHT ) - y;
 }
 
 void GameManager::handle_motion( int x, int y )
 {
-	InputManager im = InputManager::getInstance();
+	InputManager *im = &InputManager::getInstance();
 
 	float	 x_ratchet;			// X ratchet value
 	float	 y_ratchet;			// Y ratchet value
 
-
-	if ( !im.btn[ 0 ] ) {			// Left button not depressed?
+	if ( !im->btn[ 0 ] ) {			// Left button not depressed?
 		return;
 	}
 
@@ -124,27 +138,28 @@ void GameManager::handle_motion( int x, int y )
 
 	y = glutGet( GLUT_WINDOW_HEIGHT ) - y;
 
-	switch( im.curr_mode ) {
+	switch( im->curr_mode ) {
 	case TRANSLATE:			// XY translation
-		im.translate[ 0 ] += (float) ( x - im.mouse_x ) / x_ratchet;
-		im.translate[ 1 ] += (float) ( y - im.mouse_y ) / y_ratchet;
+		im->translate[ 0 ] += (float) ( x - im->mouse_x ) / x_ratchet;
+		im->translate[ 1 ] += (float) ( y - im->mouse_y ) / y_ratchet;
+		cout << "changed translation" << endl;
 		break;
 	case ROTATE_X:			// X rotation
 		x_ratchet /= 10.0;
-		im.rotate[ 0 ] += (float) ( x - im.mouse_x ) / x_ratchet;
+		im->rotate[ 0 ] += (float) ( x - im->mouse_x ) / x_ratchet;
 		break;
 	case ROTATE_Y:			// Y rotation
 		x_ratchet /= 10.0;
-		im.rotate[ 1 ] += (float) ( x - im.mouse_x ) / x_ratchet;
+		im->rotate[ 1 ] += (float) ( x - im->mouse_x ) / x_ratchet;
 		break;
 	case ROTATE_Z:			// Z rotation
 		x_ratchet /= 10.0;
-		im.rotate[ 2 ] += (float) ( x - im.mouse_x ) / x_ratchet;
+		im->rotate[ 2 ] += (float) ( x - im->mouse_x ) / x_ratchet;
 		break;
 	}
 
-	im.mouse_x = x;				// Update cursor position
-	im.mouse_y = y;
+	im->mouse_x = x;				// Update cursor position
+	im->mouse_y = y;
 
 	glutPostRedisplay();
 }
