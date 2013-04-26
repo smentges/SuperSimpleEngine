@@ -1,5 +1,6 @@
 #include "Tile.h"
-
+#include <GL/glew.h>
+#include <GL/freeglut.h>
 
 Tile::Tile(int id, int edges, float vertInfo[], int neighbors[])
 {
@@ -22,6 +23,10 @@ Tile::Tile(int id, int edges, float vertInfo[], int neighbors[])
 		cout << _neighbors[j] << " ";
 	}
 	cout << endl;
+
+	GLuint buffer;
+
+
 }
 
 

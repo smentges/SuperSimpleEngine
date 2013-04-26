@@ -3,7 +3,7 @@
 
 Level FileIO::LoadLevel(string fname) {
 	Level level;
-	cout << "Reading level from file..." << endl;
+	cout << endl << "Reading level from file..." << endl;
 	ifstream file;
 	string line = "";
 	file.open(fname);
