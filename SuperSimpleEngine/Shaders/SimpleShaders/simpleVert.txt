@@ -1,4 +1,0 @@
-attribute vec3 vPosition;
-void main(void) {
-	gl_Position = vec4(vPosition.x, vPosition.z, vPosition.y, 1.0f);
-}

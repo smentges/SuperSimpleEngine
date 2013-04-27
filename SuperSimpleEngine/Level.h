@@ -1,3 +1,4 @@
+//Minigolf program by Jason Knox and Shea Mentges
 #pragma once
 #include <vector>
 #include "Tile.h"

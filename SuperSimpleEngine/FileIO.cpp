@@ -1,3 +1,4 @@
+//Minigolf program by Jason Knox and Shea Mentges
 #include "FileIO.h"
 #include "Tile.h"
 

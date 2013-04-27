@@ -1,3 +1,4 @@
+//Minigolf program by Jason Knox and Shea Mentges
 #include "InputManager.h"
 
 
@@ -9,7 +10,7 @@ InputManager::InputManager(void)
 		translate[i] = 0;
 		rotate[i] = 0;
 	}
-	curr_mode = TRANSLATE;
+	curr_mode = TRANSLATE_X;
 }
 
 

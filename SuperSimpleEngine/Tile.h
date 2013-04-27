@@ -1,3 +1,4 @@
+//Minigolf program by Jason Knox and Shea Mentges 
 #pragma once
 #include <string>
 #include <fstream>
@@ -7,7 +8,6 @@
 #include "Object3D.h"
 #include <GL/glew.h>
 #include <GL/freeglut.h>
-#include "ShaderManager.h"
 #include "InputManager.h"
 
 using namespace std;
@@ -18,6 +18,7 @@ public:
 	void draw(float deltatime);
 	Tile(int id, int edges, float vertInfo[], int neighbors[]);
 	~Tile(void);
+	GLint vertexBuffer;
 private:
 	int _id;
 	int _edges;
