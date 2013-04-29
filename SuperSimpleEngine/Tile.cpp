@@ -27,20 +27,6 @@ Tile::Tile(int id, int edges, float vertInfo[], int neighbors[])
 
 	Shader *shader = &Shader::getInstance();
 
-	//Here's where we setup handles to each variable that is used in the shader
-    //program. See the shader source code for more detail on what the difference
-    //is between uniform and vertex attribute variables.
-    shader->modelViewLoc = glGetUniformLocation(shader->program, "M");
-    shader->projectionLoc = glGetUniformLocation(shader->program, "P");
-    shader->normalMatrixLoc = glGetUniformLocation(shader->program, "M_n");
-    shader->timeLoc = glGetUniformLocation(shader->program, "time");
-
-    //notice that, since the vertex attribute norm is not used in the shader
-    //program, shader->normalLoc = -1. If we access norm in the shader program,
-    //then this value will be >= 0.
-    shader->vertexLoc = glGetAttribLocation(shader->program, "pos");
-    shader->normalLoc = glGetAttribLocation(shader->program, "norm");
-
     //Create buffers for the vertex and normal attribute arrays
     GLuint bufs[1];
     glGenBuffers(1, bufs);
@@ -78,6 +64,24 @@ Tile::~Tile(void)
 
 void Tile::draw(float deltatime) {
 	//cout << "DRAWING TILE";
+	Shader *shader = &Shader::getInstance();
+	glBindBuffer(GL_ARRAY_BUFFER, shader->vertexBuffer); //which buffer we want
+	//to use
+	glEnableVertexAttribArray(shader->vertexLoc); //enable the attribute
+	glVertexAttribPointer(
+			shader->vertexLoc, //handle to variable in shader program
+			3, //vector size (e.g. for texture coordinates this could be 2).
+			GL_FLOAT, //what type of data is (e.g. GL_FLOAT, GL_INT, etc.)
+			GL_FALSE, //normalize the data?
+			0, //stride of data (e.g. offset in bytes). Most of the time leaving
+			//this at 0 (assumes data is in one, contiguous array) is fine
+			//unless we're doing something really complex.
+			NULL //since our stride will be 0 in general, leaving this NULL is
+			//also fine in general
+	);
+
+	glDrawArrays(GL_TRIANGLES, 0, 4);
+	glutSwapBuffers();
 
 	//cout << "TILE DRAWN";
 }

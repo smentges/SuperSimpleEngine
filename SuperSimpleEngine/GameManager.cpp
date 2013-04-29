@@ -21,11 +21,8 @@ void GameManager::Initialize(int argc, char **argv) {
 	cout << endl << "Initializing Game...";
 
 	initGL(argc, argv);
-	Shader *shader = &Shader::getInstance();
-	*shader = Shader("gles.vert", "gles.frag");
-
-
-	CurrentLevel = FileIO::getInstance().LoadLevel("hole.00.db");	
+	setupShaders();
+	CurrentLevel = FileIO::getInstance().LoadLevel("hole.00.db");
 
 	cout << endl << "Game initialized!";
 	cout << endl << "Entering main loop...";
@@ -46,6 +43,19 @@ void GameManager::initGL(int argc, char **argv) {
 	glutKeyboardFunc(keyboard);
 	glutMotionFunc(handle_motion);
 	glutMouseFunc(handle_mouse);
+	glutIdleFunc(idle);
+
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glEnable(GL_DEPTH_TEST);
+
+	camera = glm::lookAt(glm::vec3(10,10,10), glm::vec3(0,0,0), glm::vec3(0,0,1));
+
+    projection = glm::perspective(
+            glm::float_t(45),
+            glm::float_t(512) / glm::float_t(512),
+            glm::float_t(0.1),
+            glm::float_t(1000.0)
+    );
 
 	// GLEWINIT MUST BE CALLED AFTER MAKING A WINDOW, I DON'T KNOW WHY...
 	string glewError = (char*)glewGetErrorString(glewInit());
@@ -54,11 +64,26 @@ void GameManager::initGL(int argc, char **argv) {
 	cout << endl << "GLEW and FREEGLUT initialized!";
 }
 
+void GameManager::setupShaders() {
+	Shader *shader = &Shader::getInstance();
+	*shader = Shader("gles.vert", "gles.frag");
+
+	shader->modelViewLoc = glGetUniformLocation(shader->program, "M");
+    shader->projectionLoc = glGetUniformLocation(shader->program, "P");
+
+	shader->vertexLoc = glGetAttribLocation(shader->program, "pos");
+}
+
+
 void display() {
+	GameManager *gm = &GameManager::getInstance();
 	glViewport(0,0,512,512);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	mat4 modelCam = lookAt(vec3(0,0,6), vec3(0, 0, 0), vec3(0, 1, 0));
+	gm->modelView = glm::mat4();
+    gm->modelView = gm->modelView * gm->mTrans;
+	gm->camera = lookAt(vec3(10,10,10), vec3(0, 0, 0), vec3(0, 0, 1));
+	mat4 modelCam = gm->camera * gm->modelView;
 	
 	Shader *shader = &Shader::getInstance();
 
@@ -68,18 +93,15 @@ void display() {
 		shader->modelViewLoc, 1, GL_FALSE, value_ptr(modelCam));
 
 	glUniformMatrix4fv(
-		shader->projectionLoc, 1, GL_FALSE, value_ptr(mat4()));
+		shader->projectionLoc, 1, GL_FALSE, value_ptr(gm->projection));
 
 	
-
-	GameManager *gm = &GameManager::getInstance();
 	// Call draw function on all drawable objects in level.
 	for(unsigned int i = 0; i < gm->CurrentLevel.LevelObjects.size(); i++) { 
 		gm->CurrentLevel.LevelObjects[i]->draw(0.0);
 	}
 
-	glDrawArrays(GL_LINE_LOOP, 0, 3);
-	glutSwapBuffers();
+	
 	glutPostRedisplay();
 };
 
@@ -179,10 +201,11 @@ void GameManager::handle_motion( int x, int y )
 	}
 
 	gm->modelView = gm->modelView * gm->mTrans;
-
-	//glutPostRedisplay();
 }
 
+void GameManager::idle() {
+	glutPostRedisplay();
+}
 
 GameManager::GameManager(void) {}
 

@@ -17,6 +17,6 @@ void main() {
     gl_Position = P * (M * vec4(pos, 1.0));
     
     //determine vertex color based on position and time
-    vec4 color = vec4(time * pos.x, (1.0 - time) * pos.y , time * pos.z, 1.0);
+    vec4 color = vec4(0, 1 , 0, 1.0);
     frag_color = clamp(color, 0.0, 1.0);
 }

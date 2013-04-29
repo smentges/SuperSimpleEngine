@@ -20,6 +20,8 @@ class GameManager
 {
 private:
 	void initGL(int argi, char** argv);
+	void setupShaders(void);
+	static void idle(void);
 public:
 	static GameManager& getInstance()
 	{
